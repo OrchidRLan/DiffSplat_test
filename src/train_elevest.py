@@ -547,7 +547,7 @@ def main():
                     with torch.autocast("cuda", torch.bfloat16):
                         model.eval()
 
-                        all_val_matrics, val_steps = {}, 0
+                        all_val_metrics, val_steps = {}, 0
                         val_progress_bar = tqdm(
                             range(len(val_loader)) if args.max_val_steps is None \
                                 else range(args.max_val_steps),
@@ -572,8 +572,8 @@ def main():
                             val_progress_bar.update(1)
                             val_steps += 1
 
-                            all_val_matrics.setdefault("err_degree", []).append(val_err_degree)
-                            all_val_matrics.setdefault("loss", []).append(val_loss)
+                            all_val_metrics.setdefault("err_degree", []).append(val_err_degree)
+                            all_val_metrics.setdefault("loss", []).append(val_loss)
 
                             if args.max_val_steps is not None and val_steps == args.max_val_steps:
                                 break
@@ -584,19 +584,19 @@ def main():
                     # Switch back to the original model parameters
                     ema_states.restore(model.parameters())
 
-                for k, v in all_val_matrics.items():
-                    all_val_matrics[k] = torch.tensor(v).mean()
+                for k, v in all_val_metrics.items():
+                    all_val_metrics[k] = torch.tensor(v).mean()
 
                 logger.info(
                     f"Eval [{global_update_step:06d} / {total_updated_steps:06d}] " +
-                    f"err_degree: {all_val_matrics['err_degree'].item():.4f}, " +
-                    f"loss: {all_val_matrics['loss'].item():.4f}\n"
+                    f"err_degree: {all_val_metrics['err_degree'].item():.4f}, " +
+                    f"loss: {all_val_metrics['loss'].item():.4f}\n"
                 )
 
                 if accelerator.is_main_process:
                     wandb.log({
-                        "validation/err_degree": all_val_matrics["err_degree"].item(),
-                        "validation/loss": all_val_matrics["loss"].item()
+                        "validation/err_degree": all_val_metrics["err_degree"].item(),
+                        "validation/loss": all_val_metrics["loss"].item()
                     }, step=global_update_step)
 
                     # Visualize rendering
