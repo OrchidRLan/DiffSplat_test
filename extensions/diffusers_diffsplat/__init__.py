@@ -10,7 +10,7 @@ from .pipelines import (
     StableMVDiffusionXLPipeline,
     PixArtAlphaMVPipeline,
     PixArtSigmaMVPipeline,
-    StableMVDiffusion3Pipeline,
+    # StableMVDiffusion3Pipeline,
     StableMVDiffusionControlNetPipeline,
     StableMVDiffusionXLControlNetPipeline,
 )
